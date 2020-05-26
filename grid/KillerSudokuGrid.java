@@ -4,6 +4,7 @@
 package grid;
 
 import java.io.*;
+import java.util.List;
 
 
 /**
@@ -61,5 +62,38 @@ public class KillerSudokuGrid extends SudokuGrid
         // placeholder
         return false;
     } // end of validate()
+
+    @Override
+    public int getGridSize() {
+        //TODO
+        return 0;
+    }
+
+    @Override
+    public int getElement(int row, int col) {
+        //TODO
+        return 0;
+    }
+
+    @Override
+    public List<Integer> getValidSymbols() {
+        //TODO
+        return null;
+    }
+
+    @Override
+    public void setValue(int value, int row, int col) {
+        //TODO
+    }
+
+    @Override
+    public SudokuGrid clone() {
+        return null;
+    }
+
+    @Override
+    public void copy(SudokuGrid clonedGrid) {
+
+    }
 
 } // end of class KillerSudokuGrid

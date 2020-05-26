@@ -1,3 +1,6 @@
 *.class
 grid/*.class
 solver/*.class
+outputfile.out
+ValidateTester.java
+testValidate.in

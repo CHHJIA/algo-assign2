@@ -5,6 +5,7 @@
  package grid;
 
  import java.io.*;
+ import java.util.List;
 
 
 /**
@@ -62,4 +63,10 @@ public abstract class SudokuGrid
      */
     public abstract boolean validate();
 
+    public abstract int getGridSize();
+    public abstract int getElement(int row, int col);
+    public abstract List<Integer> getValidSymbols();
+    public abstract void setValue(int value, int row, int col);
+    public abstract SudokuGrid clone();
+    public abstract void copy(SudokuGrid clonedGrid);
 } // end of abstract class SudokuGrid

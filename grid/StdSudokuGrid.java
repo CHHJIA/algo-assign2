@@ -21,10 +21,12 @@ import java.util.Scanner;
 public class StdSudokuGrid extends SudokuGrid
 {
     // TODO: Add your own attributes
-    private int gridSize;
-    private List<Integer> validSymbols;
-    private int[][] grid;
 
+    private int gridSize;
+
+    private List<Integer> validSymbols;
+
+    private int[][] grid;
     public StdSudokuGrid() {
         super();
 
@@ -32,9 +34,8 @@ public class StdSudokuGrid extends SudokuGrid
     } // end of StdSudokuGrid()
 
 
+
     /* ********************************************************* */
-
-
     @Override
     public void initGrid(String filename)
         throws FileNotFoundException, IOException
@@ -70,6 +71,16 @@ public class StdSudokuGrid extends SudokuGrid
         throws FileNotFoundException, IOException
     {
         // TODO
+        try {
+            FileWriter myWriter = new FileWriter(filename);
+            myWriter.write(toString());
+            myWriter.close();
+            System.out.println("Successfully wrote to the file.");
+        } catch (IOException e) {
+            System.out.println("An error occurred in writing to file.");
+            e.printStackTrace();
+        }
+
     } // end of outputBoard()
 
 
@@ -90,9 +101,97 @@ public class StdSudokuGrid extends SudokuGrid
     @Override
     public boolean validate() {
         // TODO
+        for (int row = 0; row < gridSize; row ++) {
+            for (int col = 0; col < gridSize; col ++) {
+                int value = grid[row][col];
+                if (value != 0) {
+                    if (isUniqueInRow(row, col) && isUniqueInCol(row, col) && isUniqueInBox(row, col)) {
+                        continue;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
 
-        // placeholder
-        return false;
+        return true;
     } // end of validate()
+
+    private boolean isUniqueInBox(int row, int col) {
+        int sqrt = (int) Math.sqrt(gridSize);
+        int boxRowNum = row / sqrt;
+        int boxColNum = col / sqrt;
+        int boxFirstElemRow = boxRowNum * sqrt;
+        int boxFirstElemCol = boxColNum * sqrt;
+        int value = grid[row][col];
+        for (int i = 0; i < sqrt; i ++) {
+            for (int j = 0; j < sqrt; j ++) {
+                if ((i + boxFirstElemRow == row) && (j + boxFirstElemCol == col)) {
+                    continue;
+                }
+                if (value == grid[i + boxFirstElemRow][j + boxFirstElemCol]) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private boolean isUniqueInCol(int row, int col) {
+        int value = grid[row][col];
+        for (int i = 0; i < gridSize; i ++) {
+            if (i == row) continue;
+            if (grid[i][col] == value) return false;
+        }
+
+        return true;
+    }
+
+    private boolean isUniqueInRow(int row, int col) {
+        int value = grid[row][col];
+        for (int i = 0; i < gridSize; i ++) {
+            if (i == col) continue;
+            if (grid[row][i] == value) return false;
+        }
+
+        return true;
+    }
+
+    public int getGridSize() {
+        return gridSize;
+    }
+
+    public int getElement(int row, int col) {
+        return grid[row][col];
+    }
+
+    public List<Integer> getValidSymbols() {
+        return validSymbols;
+    }
+
+    @Override
+    public void setValue(int value, int row, int col) {
+        grid[row][col] = value;
+    }
+
+    public StdSudokuGrid clone() {
+        StdSudokuGrid cloned = new StdSudokuGrid();
+        cloned.gridSize = gridSize;
+        cloned.validSymbols = validSymbols; // Since validSymbols are not changing, we can simply use the same reference
+        cloned.grid = new int[gridSize][gridSize];
+        for(int i = 0; i < gridSize; i++)
+            cloned.grid[i] = grid[i].clone();
+
+        return cloned;
+    }
+
+    public void copy(SudokuGrid clonedGrid) {
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                grid[i][j] = clonedGrid.getElement(i, j);
+            }
+        }
+    }
 
 } // end of class StdSudokuGrid
