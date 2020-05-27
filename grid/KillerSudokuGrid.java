@@ -86,14 +86,4 @@ public class KillerSudokuGrid extends SudokuGrid
         //TODO
     }
 
-    @Override
-    public SudokuGrid clone() {
-        return null;
-    }
-
-    @Override
-    public void copy(SudokuGrid clonedGrid) {
-
-    }
-
 } // end of class KillerSudokuGrid

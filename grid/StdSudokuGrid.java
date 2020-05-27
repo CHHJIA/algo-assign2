@@ -175,23 +175,4 @@ public class StdSudokuGrid extends SudokuGrid
         grid[row][col] = value;
     }
 
-    public StdSudokuGrid clone() {
-        StdSudokuGrid cloned = new StdSudokuGrid();
-        cloned.gridSize = gridSize;
-        cloned.validSymbols = validSymbols; // Since validSymbols are not changing, we can simply use the same reference
-        cloned.grid = new int[gridSize][gridSize];
-        for(int i = 0; i < gridSize; i++)
-            cloned.grid[i] = grid[i].clone();
-
-        return cloned;
-    }
-
-    public void copy(SudokuGrid clonedGrid) {
-        for (int i = 0; i < gridSize; i++) {
-            for (int j = 0; j < gridSize; j++) {
-                grid[i][j] = clonedGrid.getElement(i, j);
-            }
-        }
-    }
-
 } // end of class StdSudokuGrid

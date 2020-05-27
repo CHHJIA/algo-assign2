@@ -60,17 +60,13 @@ public class BackTrackingSolver extends StdSudokuSolver
             }
         }
 
-        // Clone the original grid so that when backtracking is required, we don't lose the original grid
-        SudokuGrid clonedGrid = grid.clone();
-
         for (int symbol : grid.getValidSymbols()) {
-            clonedGrid.setValue(symbol, row, col);
-            if (!clonedGrid.validate()) {
+            grid.setValue(symbol, row, col);
+            if (!grid.validate()) {
                 continue;
             } else {
                 // No more empty cells, hence solution found!
-                if (!hasNextEmptyCell || backtrack(clonedGrid, nextRow, nextCol)) {
-                    grid.copy(clonedGrid);
+                if (!hasNextEmptyCell || backtrack(grid, nextRow, nextCol)) {
                     return true;
                 } else {
                     // Can't find a valid solution with symbol, so try the next symbol
@@ -79,6 +75,8 @@ public class BackTrackingSolver extends StdSudokuSolver
             }
         }
 
+        // Can't find a valid assignment to (row, col) with current config, so reset (row, col) to 0
+        grid.setValue(0, row, col);
         return false;
     }
 
