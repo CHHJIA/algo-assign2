@@ -67,4 +67,6 @@ public abstract class SudokuGrid
     public abstract int getElement(int row, int col);
     public abstract List<Integer> getValidSymbols();
     public abstract void setValue(int value, int row, int col);
+    public abstract boolean hasValue(int row, int col);
+
 } // end of abstract class SudokuGrid

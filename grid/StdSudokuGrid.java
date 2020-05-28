@@ -21,12 +21,10 @@ import java.util.Scanner;
 public class StdSudokuGrid extends SudokuGrid
 {
     // TODO: Add your own attributes
-
     private int gridSize;
-
     private List<Integer> validSymbols;
-
     private int[][] grid;
+
     public StdSudokuGrid() {
         super();
 
@@ -173,6 +171,15 @@ public class StdSudokuGrid extends SudokuGrid
     @Override
     public void setValue(int value, int row, int col) {
         grid[row][col] = value;
+    }
+
+    @Override
+    public boolean hasValue(int row, int col) {
+        if (grid[row][col] != 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 } // end of class StdSudokuGrid
