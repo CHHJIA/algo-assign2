@@ -62,7 +62,7 @@ public class BackTrackingSolver extends StdSudokuSolver
 
         for (int symbol : grid.getValidSymbols()) {
             grid.setValue(symbol, row, col);
-            if (!grid.validate()) {
+            if (!grid.partialValidate()) {
                 continue;
             } else {
                 // No more empty cells, hence solution found!

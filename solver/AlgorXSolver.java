@@ -37,20 +37,17 @@ public class AlgorXSolver extends StdSudokuSolver
         gridSize = grid.getGridSize();
         buildMatrix(grid);
 
-        Set<String> initialAssignments = new HashSet<>();
         Set<String> chosenAssignments = new HashSet<>();
         Set<String> remainingAssignments = new HashSet<>();
-        Set<String> coveredAssignments = new HashSet<>();
         Set<Integer> satisfiedConstraintIndices = new TreeSet<>();
         Set<Integer> remainingConstraintIndices = new HashSet<>();
 
-        // Fill initialAssignments, satisfiedConstraintIndices and remainingAssignments
+        // Fill satisfiedConstraintIndices and remainingAssignments
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 int value = grid.getElement(i, j);
                 if (grid.hasValue(i, j)) {
                     String assignment = Arrays.toString(new int[]{i, j, value});
-                    initialAssignments.add(assignment);
                     int[] row = matrix.get(assignment);
                     for (int k = 0; k < row.length; k++) {
                         if (row[k] == 1) satisfiedConstraintIndices.add(k);
@@ -87,7 +84,6 @@ public class AlgorXSolver extends StdSudokuSolver
             int[] row = matrix.get(assignment);
             for (int i = 0; i < row.length; i++) {
                 if (row[i] == 1 && satisfiedConstraintIndices.contains(i)) {
-                    coveredAssignments.add(assignment);
                     toRemove.add(assignment);
                     break;
                 }
@@ -95,8 +91,7 @@ public class AlgorXSolver extends StdSudokuSolver
         }
         remainingAssignments.removeAll(toRemove);
 
-        boolean result = executeAlgoX(chosenAssignments, remainingAssignments, /*coveredAssignments, satisfiedConstraintIndices,*/
-                remainingConstraintIndices);
+        boolean result = executeAlgoX(chosenAssignments, remainingAssignments, remainingConstraintIndices);
         for (String assignment : chosenAssignments) {
             String[] strings = assignment.replace("[", "").replace("]", "").split(", ");
             int[] values = new int[strings.length];
@@ -105,12 +100,10 @@ public class AlgorXSolver extends StdSudokuSolver
             }
             grid.setValue(values[VAL], values[ROW], values[COL]);
         }
-        if (result) return true;
-        else return false;
+        return result;
     } // end of solve()
 
     private boolean executeAlgoX(Set<String> chosenAssignments, Set<String> remainingAssignments,
-                              /*Set<String> coveredAssignments, Set<Integer> satisfiedConstraintIndices,*/
                               Set<Integer> remainingConstraintIndices) {
         // Solution found when remainingAssignments is empty
         if (remainingAssignments.isEmpty()) {
@@ -135,6 +128,8 @@ public class AlgorXSolver extends StdSudokuSolver
             // Select a row that satisfies the chosen constraint
             for (int j = 0; j < potentialAssignments.size(); j ++) {
                 String chosenAssignment = potentialAssignments.get(j);
+                chosenAssignments.add(chosenAssignment);
+                remainingAssignments.remove(chosenAssignment);
 
                 // Cover satisfied rows and columns
                 Set<String> tempCoveredAssignments = new HashSet<>();
@@ -144,29 +139,24 @@ public class AlgorXSolver extends StdSudokuSolver
                     if (row[i] == 1) {
                         tempSatisfiedConstraintIndices.add(i);
                         for (String assignment : remainingAssignments) {
-                            if (matrix.get(assignment)[i] == 1 && !assignment.equals(chosenAssignment)) {
+                            if (matrix.get(assignment)[i] == 1) {
                                 tempCoveredAssignments.add(assignment);
                             }
                         }
                     }
                 }
-                chosenAssignments.add(chosenAssignment);
-//                coveredAssignments.addAll(tempCoveredAssignments);
-                remainingAssignments.remove(chosenAssignment);
                 remainingAssignments.removeAll(tempCoveredAssignments);
-//                satisfiedConstraintIndices.addAll(tempSatisfiedConstraintIndices);
                 remainingConstraintIndices.removeAll(tempSatisfiedConstraintIndices);
-                if (executeAlgoX(chosenAssignments, remainingAssignments,/* coveredAssignments,
-                        satisfiedConstraintIndices, */remainingConstraintIndices)) {
+
+                // Recursion: repeat this process
+                if (executeAlgoX(chosenAssignments, remainingAssignments, remainingConstraintIndices)) {
                     return true;
                 } else {
                     // this row/assignment does not work, try the next row/assignment
                     // Once backtracked, uncover rows and columns covered previously
                     chosenAssignments.remove(chosenAssignment);
-//                    coveredAssignments.removeAll(tempCoveredAssignments);
                     remainingAssignments.add(chosenAssignment);
                     remainingAssignments.addAll(tempCoveredAssignments);
-//                    satisfiedConstraintIndices.removeAll(tempSatisfiedConstraintIndices);
                     remainingConstraintIndices.addAll(tempSatisfiedConstraintIndices);
                     continue;
                 }

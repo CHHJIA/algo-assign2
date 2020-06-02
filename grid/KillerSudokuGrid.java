@@ -64,6 +64,11 @@ public class KillerSudokuGrid extends SudokuGrid
     } // end of validate()
 
     @Override
+    public boolean partialValidate() {
+        return false;
+    }
+
+    @Override
     public int getGridSize() {
         //TODO
         return 0;

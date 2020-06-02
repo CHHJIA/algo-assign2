@@ -63,6 +63,7 @@ public abstract class SudokuGrid
      */
     public abstract boolean validate();
 
+    public abstract boolean partialValidate();
     public abstract int getGridSize();
     public abstract int getElement(int row, int col);
     public abstract List<Integer> getValidSymbols();

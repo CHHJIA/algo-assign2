@@ -108,6 +108,27 @@ public class StdSudokuGrid extends SudokuGrid
                     } else {
                         return false;
                     }
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    } // end of validate()
+
+    @Override
+    public boolean partialValidate() {
+        // TODO
+        for (int row = 0; row < gridSize; row ++) {
+            for (int col = 0; col < gridSize; col ++) {
+                int value = grid[row][col];
+                if (value != 0) {
+                    if (isUniqueInRow(row, col) && isUniqueInCol(row, col) && isUniqueInBox(row, col)) {
+                        continue;
+                    } else {
+                        return false;
+                    }
                 }
             }
         }
