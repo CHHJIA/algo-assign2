@@ -86,4 +86,9 @@ public class KillerSudokuGrid extends SudokuGrid
         //TODO
     }
 
+    @Override
+    public boolean hasValue(int row, int col) {
+        return false;
+    }
+
 } // end of class KillerSudokuGrid

@@ -44,6 +44,7 @@ public class AlgorXSolver extends StdSudokuSolver
         Set<Integer> satisfiedConstraintIndices = new TreeSet<>();
         Set<Integer> remainingConstraintIndices = new HashSet<>();
 
+        // Fill initialAssignments, satisfiedConstraintIndices and remainingAssignments
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 int value = grid.getElement(i, j);
@@ -67,7 +68,7 @@ public class AlgorXSolver extends StdSudokuSolver
         String randAssignment = Arrays.toString(new int[]{0, 0, grid.getValidSymbols().get(0)});
         int constraintListSize = matrix.get(randAssignment).length;
 
-        // Get the set difference between satisfiedConstraintIndices and allConstraintList
+        // Get the set difference between satisfiedConstraintIndices and allConstraintList to fill remainingConstraintIndices
         int tempIndex = 0;
         for (Integer index : satisfiedConstraintIndices) {
             for (int i = tempIndex; i < index; i ++) {
@@ -80,20 +81,100 @@ public class AlgorXSolver extends StdSudokuSolver
         }
 
         // Cover rows that have 1 at indices in satisfiedConstraintIndices
+        // Remove an assignment from remainingAssignments if it is covered
+        List<String> toRemove = new ArrayList<>();
         for (String assignment : remainingAssignments) {
             int[] row = matrix.get(assignment);
             for (int i = 0; i < row.length; i++) {
                 if (row[i] == 1 && satisfiedConstraintIndices.contains(i)) {
                     coveredAssignments.add(assignment);
+                    toRemove.add(assignment);
                     break;
                 }
             }
         }
+        remainingAssignments.removeAll(toRemove);
 
-
-        // placeholder
-        return false;
+        boolean result = executeAlgoX(chosenAssignments, remainingAssignments, /*coveredAssignments, satisfiedConstraintIndices,*/
+                remainingConstraintIndices);
+        for (String assignment : chosenAssignments) {
+            String[] strings = assignment.replace("[", "").replace("]", "").split(", ");
+            int[] values = new int[strings.length];
+            for (int i = 0; i < values.length; i++) {
+                values[i] = Integer.parseInt(strings[i]);
+            }
+            grid.setValue(values[VAL], values[ROW], values[COL]);
+        }
+        if (result) return true;
+        else return false;
     } // end of solve()
+
+    private boolean executeAlgoX(Set<String> chosenAssignments, Set<String> remainingAssignments,
+                              /*Set<String> coveredAssignments, Set<Integer> satisfiedConstraintIndices,*/
+                              Set<Integer> remainingConstraintIndices) {
+        // Solution found when remainingAssignments is empty
+        if (remainingAssignments.isEmpty()) {
+            return true;
+        }
+
+        // Select a constraint to fulfill
+        int chosenConstraintIndex = remainingConstraintIndices.iterator().next();
+
+        // Find all the rows that satisfy the chosen constraint
+        List<String> potentialAssignments = new ArrayList<>();
+        for (String assignment : remainingAssignments) {
+            if (matrix.get(assignment)[chosenConstraintIndex] == 1) {
+                potentialAssignments.add(assignment);
+            }
+        }
+
+        // Backtrack if a constraint can't be satisfied with remaining rows
+        if (potentialAssignments.isEmpty()) {
+            return false;
+        } else {
+            // Select a row that satisfies the chosen constraint
+            for (int j = 0; j < potentialAssignments.size(); j ++) {
+                String chosenAssignment = potentialAssignments.get(j);
+
+                // Cover satisfied rows and columns
+                Set<String> tempCoveredAssignments = new HashSet<>();
+                Set<Integer> tempSatisfiedConstraintIndices = new HashSet<>();
+                int[] row = matrix.get(chosenAssignment);
+                for (int i = 0; i < row.length; i++) {
+                    if (row[i] == 1) {
+                        tempSatisfiedConstraintIndices.add(i);
+                        for (String assignment : remainingAssignments) {
+                            if (matrix.get(assignment)[i] == 1 && !assignment.equals(chosenAssignment)) {
+                                tempCoveredAssignments.add(assignment);
+                            }
+                        }
+                    }
+                }
+                chosenAssignments.add(chosenAssignment);
+//                coveredAssignments.addAll(tempCoveredAssignments);
+                remainingAssignments.remove(chosenAssignment);
+                remainingAssignments.removeAll(tempCoveredAssignments);
+//                satisfiedConstraintIndices.addAll(tempSatisfiedConstraintIndices);
+                remainingConstraintIndices.removeAll(tempSatisfiedConstraintIndices);
+                if (executeAlgoX(chosenAssignments, remainingAssignments,/* coveredAssignments,
+                        satisfiedConstraintIndices, */remainingConstraintIndices)) {
+                    return true;
+                } else {
+                    // this row/assignment does not work, try the next row/assignment
+                    // Once backtracked, uncover rows and columns covered previously
+                    chosenAssignments.remove(chosenAssignment);
+//                    coveredAssignments.removeAll(tempCoveredAssignments);
+                    remainingAssignments.add(chosenAssignment);
+                    remainingAssignments.addAll(tempCoveredAssignments);
+//                    satisfiedConstraintIndices.removeAll(tempSatisfiedConstraintIndices);
+                    remainingConstraintIndices.addAll(tempSatisfiedConstraintIndices);
+                    continue;
+                }
+            }
+        }
+
+        return false;
+    }
 
     private void buildMatrix(SudokuGrid grid) {
         matrix = new HashMap<>();
